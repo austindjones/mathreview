@@ -1,9 +1,10 @@
 *.pyc
 *~
+*db.sqlite3
 __pycache__
 db.mysql
-static
+theorems/static
 mathreview
-media
+theorems/media
 .DS_Store
 *settings.py
