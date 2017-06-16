@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>index</title>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+        MathJax.Hub.Config({
+            extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+            jax: ["input/TeX", "output/SVG"],
+            SVG: {
+                     font:"STIX-web"
+            },
+            tex2jax: { 
+                inlineMath:  [ ['$','$']     ,['{$','$}']     , ['\\(','\\)'] ], 
+                displayMath: [ ['$$','$$'] ,['{$$','$$}'] , ['\\[','\\]'] ],
+                processEscapes: true 
+            },
+            TeX: {
+                extensions: ["AMSmath.js", "AMSsymbols.js"],
+                Macros: {
+                R: "{\\mathbb{R}}",
+                bold: ["{\\bf #1}",1],
+                C: "{\\mathbb{C}}",
+                N: "{\\mathbb{N}}",
+                Z: "{\\mathbb{Z}}",
+                ds: "\\displaystyle",
+                textdef: ["\\textit{#1}",1],
+                emph: ["\\textit{#1}",1]
+                }
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' href='/static/stylesheets/style.css'>
+</head>
+<body class='homepage'>
+    <div class='container-fluid'>
+        <nav class='navbar navbar-inverse'>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        </button>
+            </div> <!--navbar-header -->
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                   <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
+                   <li class='active'> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                </ul>
+            </div> <!-- navbar -->
+        </nav>
+        <header>
+            Math Review
+        </header>
+        <div class='wrapper'>
+            <main>
+              <div class='content'>
+                {% if theorem_name %}
+                <h3 class='center'>{{ theorem_name }}</h3>
+                    <div class="well well-lg">{{ theorem_statement|safe }}</div>
+                {% for proof in proofs %}
+                    {% for deflink in proof.proof_definition_link_set.all %}
+                        {% if forloop.first %}
+                          <div class="panel panel-default">
+                            <div class='panel-heading'>
+                              <h4 class='panel-title'>
+                                <a data-toggle="collapse" href='#definitions'>Definitions<span class='caret'></span></a>
+                              </h4>
+                            </div>
+                            <div id='definitions' class='panel-collapse collapse'>
+                              <div class='panel-body'>
+                        {% endif %}
+                                <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                    <h4 class='panel-title'>
+                                      <a data-toggle='collapse' href='#def{{deflink.definition.id}}'>{{deflink.definition.definition_name}}<span class='caret'></span></a>
+                                    </h4>
+                                  </div>
+                                  <div id="def{{deflink.definition.id}}" class='panel-collapse collapse in'>
+                                    <div class='panel-body'>{{deflink.definition.definition|safe}}</div>
+                                  </div>
+                                </div>
+                        {% if forloop.last %}</div></div></div>{% endif %}  
+                    {% endfor %}
+                <h4>PROOF:</h4>
+                    <div>{{proof.theorem_proof|safe|linebreaksbr}}</div>  
+                {% endfor %}
+                
+                {% endif %}
+              </div> <!-- content -->
+
+              {% if proofs.has_other_pages %} 
+                {% if proofs.has_previous %}
+                <ul class="paging text-center">
+                    <li><a class="btn btn-default" href="?page={{proofs.previous_page_number}}"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
+                
+                {% else %}
+                <ul class="paging text-center">
+                  <li><a href="#" class="disabled btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
+                
+                {% endif %}
+
+
+                {% if proofs.has_previous %}
+                  {% if proofs.previous_page_number|add:"-2" > 1 %}
+		      <li><a href="?page=1">1</a></li>
+                      <li>...</li>
+		      <li><a href="?page={{proofs.previous_page_number|add:'-1'}}">{{proofs.previous_page_number|add:"-1"}}</a></li>
+		      <li><a href="?page={{proofs.previous_page_number}}">{{proofs.previous_page_number}}</a></li>
+			      
+		  {% elif proofs.previous_page_number|add:"-1" > 1 %}
+		      <li><a href="?page=1">1</a></li>
+		      <li><a href="?page={{proofs.previous_page_number|add:'-1'}}">{{proofs.previous_page_number|add:"-1"}}</a></li>
+		      <li><a href="?page={{proofs.previous_page_number}}">{{proofs.previous_page_number}}</a></li>
+				      
+		  {% elif proofs.previous_page_number > 1 %}
+		      <li><a href="?page=1">1</a></li>
+		      <li><a href="?page={{proofs.previous_page_number}}">{{proofs.previous_page_number}}</a></li>
+					
+		  {% else %}
+		      <li><a href="?page=1">1</a></li>
+                  {% endif %}
+                {% endif %}
+
+                      <li><a class='disabled btn btn-link'  href="#">{{proofs.number}}</a></li>  
+                  
+
+                {% if proofs.has_next %}  
+                  {% if proofs.next_page_number|add:"2" < proofs.paginator.num_pages %} 
+
+		      <li><a href="?page={{proofs.next_page_number}}">{{proofs.next_page_number}}</a></li>
+		      <li><a href="?page={{proofs.next_page_number|add:'1'}}">{{proofs.next_page_number|add:"1"}}</a></li>
+		      <li>...</li>
+		      <li><a href="?page={{proofs.paginator.num_pages}}">{{proofs.paginator.num_pages}}</a></li>
+
+		  {% elif proofs.next_page_number|add:"1" < proofs.paginator.num_pages %}
+                      <li><a href="?page={{proofs.next_page_number}}">{{proofs.next_page_number}}</a></li>
+		      <li><a href="?page={{proofs.next_page_number|add:'1'}}">{{proofs.next_page_number|add:"1"}}</a></li>
+		      <li><a href="?page={{proofs.paginator.num_pages}}">{{proofs.paginator.num_pages}}</a></li>
+
+		  {% elif proofs.next_page_number < proofs.paginator.num_pages %}
+                      <li><a href="?page={{proofs.next_page_number}}">{{proofs.next_page_number}}</a></li>
+		      <li><a href="?page={{proofs.paginator.num_pages}}">{{proofs.paginator.num_pages}}</a></li>
+                  {% else %}
+                      <li><a href="?page={{proofs.paginator.num_pages}}">{{proofs.paginator.num_pages}}</a></li>
+                  {% endif %}															
+                {% endif %}
+
+                {% if proofs.has_next %}
+                    <li><a class="btn btn-default" role='button' href="?page={{proofs.next_page_number}}">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
+                </ul>
+                {% else %}
+                    <li><a class="btn btn-default disabled" role='button' href="#">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
+                </ul>
+                {% endif %}
+              {% endif %}
+            </main>
+        </div> <!-- div.wrapper -->
+        <footer>
+            Footer
+        </footer>
+    </div> <!-- div.container -->
+</body>    
+</html>

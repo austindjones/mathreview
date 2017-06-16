@@ -1,0 +1,9 @@
+*.pyc
+*~
+__pycache__
+db.mysql
+static
+mathreview
+media
+.DS_Store
+*settings.py

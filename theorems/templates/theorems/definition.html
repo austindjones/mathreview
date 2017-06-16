@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>index</title>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+        MathJax.Hub.Config({
+            extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+            jax: ["input/TeX", "output/SVG"],
+            SVG: {
+                     font:"STIX-web"
+            },
+            tex2jax: { 
+                inlineMath:  [ ['$','$']     ,['{$','$}']     , ['\\(','\\)'] ], 
+                displayMath: [ ['$$','$$'] ,['{$$','$$}'] , ['\\[','\\]'] ],
+                processEscapes: true 
+            },
+            TeX: {
+                extensions: ["AMSmath.js", "AMSsymbols.js"],
+                Macros: {
+                R: "{\\mathbb{R}}",
+                bold: ["{\\bf #1}",1],
+                C: "{\\mathbb{C}}",
+                N: "{\\mathbb{N}}",
+                Z: "{\\mathbb{Z}}",
+                ds: "\\displaystyle",
+                textdef: ["\\textit{#1}",1],
+                emph: ["\\textit{#1}",1]
+                }
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' href='/static/stylesheets/style.css'>
+</head>
+<body class='homepage'>
+    <div class='container-fluid'>
+        <nav class='navbar navbar-inverse'>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        </button>
+            </div> <!--navbar-header -->
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                   <li class='active'><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                </ul>
+            </div> <!-- navbar -->
+        </nav>
+        <header>
+            Math Review
+        </header>
+        <div class='wrapper'>
+            <main>
+                {% if question %}
+                <h3 class='center'>Question of the Moment</h3>
+                <div class='center'>
+                    Question {{ question_num  }}
+                </div>
+                <div id='questionText'>
+                    {{ question.question_text|safe }}
+                </div>
+                <div id='answerLink'><a href='{% url 'theorems:question' question.id  %}'>answer</a></div>
+                {% endif %}
+            </main>
+        </div> <!-- div.wrapper -->
+        <footer>
+            Footer
+        </footer>
+    </div> <!-- div.container -->
+</body>    
+</html>
