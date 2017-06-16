@@ -26,28 +26,21 @@ def index(request):
     return render(request,'theorems/index.html',context)
 
 def subjects(request):
-    rpp = 10  #rpp = results per page
     subjects_list = Subject.objects.order_by(Lower('subject_name').asc())
-    paginator = Paginator(subjects_list, rpp ,orphans=4 ,allow_empty_first_page=True)
-    page = None
-    if request.method == 'GET':
-        if 'id' in request.GET:
-            subject_id = request.GET['id']
-            if subject_id:
-                sub =Subject.objects.get(id=subject_id)
-                if sub:
-                    pageIndex = list(subjects_list).index(sub) + 1 # add 1 because index starts at 0
-                    page = pageIndex//rpp if pageIndex%rpp == 0 else (pageIndex//rpp + 1 if pageIndex//rpp +1 <= paginator.num_pages else paginator.num_pages)   #must compare to .num_pages due to number of items on last page increasing to avoid orphans
-        else:
-            page = request.GET.get('page')
-    try:    
-        subs = paginator.page(page)
-    except PageNotAnInteger:
-        subs = paginator.page(1) #show first page
-    except EmptyPage:
-        subs = paginator.page(paginator.num_pages) #show last page
+    if request.GET and 'id' in request.GET:
+        subject_id = request.GET['id']   # don't need to check if subject_id == '' or none because I'm using get_object_or_404 
+        specific_subject = get_object_or_404(subjects_list,id=subject_id)
+        try:
+            specific_subject_index = list(subjects_list).index(specific_subject) + 1
+        except ValueError:
+            specific_subject_index = None
+    else:
+        specific_subject = None
+        specific_subject_index = None
     context = {
-                  'subjects':subs
+                  'specific_subject_index': specific_subject_index,
+                  'specific_subject': specific_subject,
+                  'subjects':subjects_list
               }
     return render(request,'theorems/subjects.html',context)
         
