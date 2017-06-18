@@ -46,70 +46,46 @@ def subjects(request):
         
 
 def subject_theorems(request, subject_id):
-    rpp = 10  #rpp = results per page
+    subject_name = get_object_or_404(Subject, id=subject_id).subject_name
     theorem_list = list(Theorem.objects.filter( subject_id__exact=subject_id))
     theorem_list.sort(key=lambda x:x.theorem_name)
-    paginator = Paginator(theorem_list, rpp ,orphans=4 ,allow_empty_first_page=True)
-    page = request.GET.get('page')
-    try:    
-        thrms = paginator.page(page)
-    except PageNotAnInteger:
-        thrms = paginator.page(1) #show first page
-    except EmptyPage:
-        thrms = paginator.page(paginator.num_pages) #show last page
     context = {
-                  'subject_name': get_object_or_404(Subject, id=subject_id).subject_name,
-                  'theorems':thrms
+                  'subject_name': subject_name,
+                  'theorems':theorem_list
               }
     return render(request,'theorems/subject_theorems.html',context)
 
 def subject_definitions(request, subject_id):
-    rpp = 10  #rpp = results per page
+    subject_name = get_object_or_404(Subject, id=subject_id).subject_name
     definition_list = list(Definition.objects.filter(subject_id__exact=subject_id))
-    definition_list.sort(key=lambda x: x.definition_name)    
-    paginator = Paginator(definition_list, rpp ,orphans=4 ,allow_empty_first_page=True)
-    page = request.GET.get('page')
-    try:    
-        defs = paginator.page(page)
-    except PageNotAnInteger:
-        defs = paginator.page(1) #show first page
-    except EmptyPage:
-        defs = paginator.page(paginator.num_pages) #show last page
+    definition_list.sort(key=lambda x: x.definition_name)
     context = {
-                  'subject_name': get_object_or_404(Subject, id=subject_id).subject_name,
-                  'definitions': defs
+                  'subject_name': subject_name,
+                  'definitions': definition_list
               }
     return render(request,'theorems/subject_definitions.html',context)
 
 def theorems(request):
-    rpp = 10  #rpp = results per page
     theorem_list = Theorem.objects.order_by(Lower('theorem_name').asc())
-    paginator = Paginator(theorem_list, rpp ,orphans=4 ,allow_empty_first_page=True)
-    page = request.GET.get('page')
-    try:    
-        thrms = paginator.page(page)
-    except PageNotAnInteger:
-        thrms = paginator.page(1) #show first page
-    except EmptyPage:
-        thrms = paginator.page(paginator.num_pages) #show last page
     context = {
-                  'theorems':thrms
+                  'theorems':theorem_list
               }
     return render(request,'theorems/theorems.html',context)
 
-def theorem_proof(request,theorem_id):
-    rpp = 1  #rpp = results per page
-    proof_list = Theorem_Proof.objects.filter(theorem_id__exact=theorem_id).order_by('id')
-    theorem = Theorem.objects.get(id=theorem_id)
+def theorem_proof(request,theorem_id,proof_num):
+    rpp = 1
+    theorem = get_object_or_404(Theorem,id=theorem_id)
+    proof_list = theorem.theorem_proof_set.order_by('id')
     paginator = Paginator(proof_list, rpp ,orphans=0 ,allow_empty_first_page=True)
-    page = request.GET.get('page')
+    page = proof_num
     try:    
         proofs = paginator.page(page)
     except PageNotAnInteger:
-        proofs = paginator.page(1) #show first page
+        return redirect('theorem:theorem_proof',theorem_id=theorem_id,proof_num=1,permanent=True) # redirect to first page
     except EmptyPage:
-        proofs = paginator.page(paginator.num_pages) #show last page
+        return redirect('theorem:theorem_proof',theorem_id=theorem_id,proof_num=paginator.num_pages,permanent=True) # show last page
     context = {
+                  'theorem_id': theorem.id,
                   'theorem_name': theorem.theorem_name,
                   'theorem_statement': theorem.theorem_statement.theorem_statement,
                   'proofs':proofs
@@ -117,23 +93,11 @@ def theorem_proof(request,theorem_id):
     return render(request,'theorems/theorem_proof.html',context)
 
 def definitions(request):
-    rpp = 10  #rpp = results per page
     definition_list = Definition.objects.order_by(Lower('definition_name').asc())
-    paginator = Paginator(definition_list, rpp ,orphans=4 ,allow_empty_first_page=True)
-    page = request.GET.get('page')
-    try:    
-        defs= paginator.page(page)
-    except PageNotAnInteger:
-        defs = paginator.page(1) #show first page
-    except EmptyPage:
-        defs = paginator.page(paginator.num_pages) #show last page
     context = {
-                  'definitions':defs
+                  'definitions':definition_list
               }
     return render(request,'theorems/definitions.html',context)
-
-def definition(request,definition_id):
-    return HttpResponse("""You're looking at definition %s""" % definition_id)
 
 def questions(request):
     return HttpResponse("""You're looking at all the questions on page %s""" % 1)

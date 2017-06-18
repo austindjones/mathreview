@@ -1,3 +1,4 @@
+{% load theorems_extra %}
 <!DOCTYPE html />
 <html>
 <head>
@@ -5,7 +6,7 @@
     <meta name='viewport' content='width=device-width,initial-scale=1' />
     <title>index</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -37,6 +38,29 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+    <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+          marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: true,
+            pedantic: false,
+            sanitize: true,
+            smartLists: true,
+            smartypants: false
+        });
+        $(".markdown").each(function(){
+            var renderedHtml = marked($(this).text());
+            $(this).html(renderedHtml);
+            console.log(renderedHtml);
+        });
+      
+        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
+      });
+    </script>
     <link rel='stylesheet' href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
@@ -51,11 +75,11 @@
             </div> <!--navbar-header -->
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                   <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
-                   <li class='active'> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                   <li><a href='{% url 'theorems:index' %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li><a href='{% url 'theorems:subjects' %}'>Subjects</a></li>
+                   <li class='active'> <a href='{% url 'theorems:definitions' %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems' %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions' %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -67,31 +91,63 @@
                 {% if definitions %}
                 <h3 class='center'>Definitions</h3>
                 <table id="defTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                      <tr>
-                        <th>Term</th>
-                        <th>Subject</th>
-                        <th>Definition</th>
-                      </tr>
-                    </thead>
-                    <tfoot>
-                      <tr>
-                        <th>Term</th>
-                        <th>Subject</th>
-                        <th>Definition</th>
-                      </tr>
-                    </tfoot>
-                    <tbody>
-                {% for definition in definitions %}
-                        <tr>
-                            <td>{{ definition.definition_name }}</td>
-                            <td>{{ definition.subject.subject_name }}</td>
-                            <td><a href="{% url 'theorems:definition' definition.id %}">view definition</a></td>
-                        </tr>
-                {% endfor %}
-                </tbody>
+                  <thead>
+                    <tr>
+                      <th>Term</th>
+                      <th>Subject</th>
+                      <th>Definition</th>
+		      <th>Used In</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <th>Term</th>
+                      <th>Subject</th>
+                      <th>Definition</th>
+		    <th>Used In</th>
+                    </tr>
+                  </tfoot>
+                  <tbody>
+                  {% for definition in definitions %}
+                    <tr>
+                      <td>{{ definition.definition_name }}</td>
+                      <td>{{ definition.subject.subject_name }}</td>
+                      <td><button type="button" class="btn-link" data-toggle="modal" data-target="#myModal{{forloop.counter}}">view definition</button>
+		      </td>
+		      <td>{% for link in definition.proof_definition_link_set.all %}
+                          {% proof_index link.proof as proofindex %} 
+                          <a href="{% url 'theorems:theorem_proof' link.proof.theorem.id proofindex %}">proof {{proofindex}}</a> of {{ link.proof.theorem.theorem_name }}
+                          {% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                      </td>
+                    </tr>
+		  {% endfor %}
+	          {% else %}
+		    <tr><td></td><td></td><td></td><td></td></tr>
+		  {% endif %}
+                  </tbody>
                 </table>
-                {% endif %}
+		{% for definition in definitions %}
+                <!-- Modal -->
+		<div id="myModal{{forloop.counter}}" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+
+		    <!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title">{{definition.definition_name}}</h4>
+		      </div>
+		      <div class="modal-body">
+			<p class="markdown">{{definition.definition}}</p>
+		      </div>
+		      <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		{% endfor %}
             </main>
         </div> <!-- div.wrapper -->
         <footer>

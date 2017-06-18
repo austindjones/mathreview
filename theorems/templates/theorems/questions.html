@@ -5,7 +5,7 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>index</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -35,6 +35,29 @@
 	{% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+    <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+          marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: true,
+            pedantic: false,
+            sanitize: true,
+            smartLists: true,
+            smartypants: false
+        });
+        $(".markdown").each(function(){
+            var renderedHtml = marked($(this).text());
+            $(this).html(renderedHtml);
+            console.log(renderedHtml);
+        });
+      
+        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
+      });
+    </script>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -49,10 +72,10 @@
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
                    <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li class='active'><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
-                   <li> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                   <li class='active'><a href='{% url 'theorems:subjects'  %}'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions'  %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems'  %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions'  %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -70,8 +93,8 @@
                 {% for subject in subjects %}
                     <li>{{ subject.subject_name  }}
                         <ul>
-                            <li><a href='{% url 'theorems:subject_theorems' subject.id  %}?page=1'>Theorems</a></li>
-                            <li><a href='{% url 'theorems:subject_definitions' subject.id  %}?page=1'>Definitions</a></li>
+                            <li><a href='{% url 'theorems:subject_theorems' subject.id  %}'>Theorems</a></li>
+                            <li><a href='{% url 'theorems:subject_definitions' subject.id  %}'>Definitions</a></li>
                         </ul>
                     </li>
                 {% endfor %}

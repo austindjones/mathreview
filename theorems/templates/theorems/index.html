@@ -5,7 +5,7 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>index</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -25,6 +25,7 @@
                 C: "{\\mathbb{C}}",
                 N: "{\\mathbb{N}}",
                 Z: "{\\mathbb{Z}}",
+	        Q: "{\\mathbb{Q}}",
                 ds: "\\displaystyle",
                 textdef: ["\\textit{#1}",1],
                 emph: ["\\textit{#1}",1]
@@ -35,6 +36,29 @@
 	{% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+    <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+          marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: true,
+            pedantic: false,
+            sanitize: true,
+            smartLists: true,
+            smartypants: false
+        });
+        $(".markdown").each(function(){
+            var renderedHtml = marked($(this).text());
+            $(this).html(renderedHtml);
+            console.log(renderedHtml);
+        });
+      
+        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
+      });
+    </script>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -48,11 +72,11 @@
             </div> <!--navbar-header -->
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                   <li class='active'><a href="{% url 'theorems:index'  %}"><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li><a href="{% url 'theorems:subjects'  %}?page=1">Subjects</a></li>
-                   <li> <a href="{% url 'theorems:definitions'  %}?page=1">Definitions</a></li>
-                   <li> <a href="{% url 'theorems:theorems'  %}?page=1">Theorems</a></li>
-                   <li> <a href="{% url 'theorems:questions'  %}?page=1">Questions</a></li>
+                   <li class='active'><a href="{% url 'theorems:index' %}"><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li><a href="{% url 'theorems:subjects' %}">Subjects</a></li>
+                   <li> <a href="{% url 'theorems:definitions' %}">Definitions</a></li>
+                   <li> <a href="{% url 'theorems:theorems' %}">Theorems</a></li>
+                   <li> <a href="{% url 'theorems:questions' %}">Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -63,13 +87,24 @@
             <main>
                 {% if question %}
                 <h3 class='center'>Question of the Moment</h3>
-                <div class='center'>
-                    Question {{ question_num  }}
+		<div class="panel panel-default">
+		  <div class="panel-heading"><h4 class='panel-title'><span class='panel-padded'>Question {{question_num}}</span></h4></div>
+                  <div class="panel-body">
+		    <div class="markdown">{{question.question_text}}</div>
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a class="panel-padded" data-toggle="collapse" href="#answer">Answer<span class="caret"></a>
+                          </h4>
+                        </div>
+                        <div id="answer" class="panel-collapse collapse">
+                          <div class="panel-body markdown">{{question.answer_text}}</div>
+                        </div>
+                      </div>
+                    </div>
+		  </div>
                 </div>
-                <div id='questionText'>
-                    {{ question.question_text|safe }}
-                </div>
-                <div id='answerLink'><a href='{% url 'theorems:question' question.id  %}'>answer</a></div>
                 {% endif %}
             </main>
         </div> <!-- div.wrapper -->
