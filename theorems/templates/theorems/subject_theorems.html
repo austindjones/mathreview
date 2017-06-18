@@ -5,7 +5,7 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>index</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script> <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -35,6 +35,32 @@
 	{% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+    <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+          marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: true,
+            pedantic: false,
+            sanitize: true,
+            smartLists: true,
+            smartypants: false
+        });
+        $(".markdown").each(function(){
+            var renderedHtml = marked($(this).text());
+            $(this).html(renderedHtml);
+            console.log(renderedHtml);
+        });
+      
+        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
+      });
+    </script>
+    <link rel='stylesheet' href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -48,11 +74,11 @@
             </div> <!--navbar-header -->
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                   <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li class='active'><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
-                   <li> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                   <li><a href='{% url 'theorems:index' %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li class='active'><a href='{% url 'theorems:subjects' %}'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions' %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems' %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions' %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -61,107 +87,53 @@
         </header>
         <div class='wrapper'>
             <main>
-                <h3 class='center'>{% if subject_name %} {{ subject_name }} {% endif %}</h3>
-                {% if theorems %}
-                <div class='center'>
-                    Theorems {{ theorems.start_index }} &ndash; {{ theorems.end_index }} of {{ theorems.paginator.count }}
-                </div>
-                <ul>
-                {% for theorem in theorems %}
-                    <li> {{ theorem.theorem_name }}
-                        <ul>
-                            <li>{{ theorem.theorem_statement|safe  }}</li>
-                                {% with proof_total=theorem.theorem_proof_set.all.count %}
-                                    {% if proof_total > 0 %}
-                            <li><a href= "{% url 'theorems:theorem_proof' theorem.id %}">view proof{{ proof_total|pluralize }}</a></li>
-                                    {% endif %}
-                                {% endwith %}
-                            
-                            {% for item in theorem.theorem_keyword_link_set.all %}
-                                {% if forloop.first %}
-                            <li> Keywords:
-                                {% endif %} 
-                                {{ item.keyword.keyword_text }}{% if not forloop.last %}, {% else %}</li> {% endif %} 
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-                </ul>
-                {% else %}
-                    <div>There are no theorems to display</div>
-                {% endif %}
-            
-                {% if theorems.has_other_pages %} 
-                {% if theorems.has_previous %}
-                <ul class="paging text-center">
-                    <li><a class="btn btn-default" href="?page={{theorems.previous_page_number}}"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
-                
-                {% else %}
-                <ul class="paging text-center">
-                    <li><a class="btn btn-default disabled" href="#"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
-                
-                {% endif %}
-
-
-                {% if theorems.has_previous %}
-                  {% if theorems.previous_page_number|add:"-2" > 1 %}
-		      <li><a href="?page=1">1</a></li>
-                      <li>...</li>
-		      <li><a href="?page={{theorems.previous_page_number|add:'-1'}}">{{theorems.previous_page_number|add:"-1"}}</a></li>
-		      <li><a href="?page={{theorems.previous_page_number}}">{{theorems.previous_page_number}}</a></li>
-			      
-		  {% elif theorems.previous_page_number|add:"-1" > 1 %}
-		      <li><a href="?page=1">1</a></li>
-		      <li><a href="?page={{theorems.previous_page_number|add:'-1'}}">{{theorems.previous_page_number|add:"-1"}}</a></li>
-		      <li><a href="?page={{theorems.previous_page_number}}">{{theorems.previous_page_number}}</a></li>
-				      
-		  {% elif theorems.previous_page_number > 1 %}
-		      <li><a href="?page=1">1</a></li>
-		      <li><a href="?page={{theorems.previous_page_number}}">{{theorems.previous_page_number}}</a></li>
-					
-		  {% else %}
-		      <li><a href="?page=1">1</a></li>
-                  {% endif %}
-                {% endif %}
-
-                      <li><a class='disabled btn btn-link' href="#">{{theorems.number}}</a></li>  
-                  
-
-                {% if theorems.has_next %}
-                  {% if theorems.next_page_number|add:"2" < theorems.paginator.num_pages %} 
-
-		      <li><a href="?page={{theorems.next_page_number}}">{{theorems.next_page_number}}</a></li>
-		      <li><a href="?page={{theorems.next_page_number|add:'1'}}">{{theorems.next_page_number|add:"1"}}</a></li>
-		      <li>...</li>
-		      <li><a href="?page={{theorems.paginator.num_pages}}">{{theorems.paginator.num_pages}}</a></li>
-
-		  {% elif theorems.next_page_number|add:"1" < theorems.paginator.num_pages %}
-                      <li><a href="?page={{theorems.next_page_number}}">{{theorems.next_page_number}}</a></li>
-		      <li><a href="?page={{theorems.next_page_number|add:'1'}}">{{theorems.next_page_number|add:"1"}}</a></li>
-		      <li><a href="?page={{theorems.paginator.num_pages}}">{{theorems.paginator.num_pages}}</a></li>
-
-		  {% elif theorems.next_page_number < theorems.paginator.num_pages %}
-                      <li><a href="?page={{theorems.next_page_number}}">{{theorems.next_page_number}}</a></li>
-		      <li><a href="?page={{theorems.paginator.num_pages}}">{{theorems.paginator.num_pages}}</a></li>
-                  {% else %}
-                        <li>{{ theorems.num_pages }}</li>
-                      <li><a href="?page={{theorems.paginator.num_pages}}">{{theorems.paginator.num_pages}}</a></li>
-                  {% endif %}															
-                {% endif %}
-
-                {% if theorems.has_next %}
-                    <li><a class="btn btn-default" href="?page={{theorems.next_page_number}}">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
-                </ul>
-                {% else %}
-                    <li><a class="disabled btn btn-default" href="#">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
-                </ul>
-                {% endif %}
-              {% endif %}
+                <h3 class='center'>{% if subject_name %} {{ subject_name }} {% endif %} Theorems</h3>
+                <table id="thrmTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+		<thead>
+		  <tr>
+		    <th>theorem</th>
+		    <th>keywords</th>
+		    <th>statement</th>
+		    <th>proof</th>
+		  </tr>
+		</thead>
+		<tfoot>
+                  <tr>
+		    <th>theorem</th>
+		    <th>keywords</th>
+		    <th>statement</th>
+		    <th>proof</th>
+		  </tr>
+		</tfoot>
+		<tbody>
+                  {% if theorems %}
+		  {% for theorem in theorems %}
+                  <tr>
+		    <td>{{theorem.theorem_name}}</td>
+		    <td>{% for item in theorem.theorem_keyword_link_set.all %}{{ item.keyword.keyword_text }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+		    <td class="markdown">{{theorem.theorem_statement.theorem_statement}}</td>
+		    <td>{% for proof in theorem.theorem_proof_set.all %}
+                         <a href= "{% url 'theorems:theorem_proof' theorem.id forloop.counter %}">proof {{forloop.counter}}</a>{% if not forloop.last %}, {% endif %}
+                         {% endfor %}
+		    </td>
+		  </tr>
+		  {% endfor %}
+		  {% endif %}
+		</tbody>
+	      </table>
             </main>
         </div> <!-- div.wrapper -->
         <footer>
             Footer
         </footer>
     </div> <!-- div.container -->
+    <script>
+    $(document).ready(function() {
+        $('#thrmTable').DataTable({
+            "lengthMenu": [10,25,50],
+            "pagingType": "full_numbers"
+        });
+    });
+</script>
 </body>    
 </html>

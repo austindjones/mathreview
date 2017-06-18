@@ -6,7 +6,7 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>{{ subject_name }} Definitions </title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -36,6 +36,32 @@
 	{% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
+    <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
+    <script>
+      $(document).ready(function(){
+          marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: true,
+            pedantic: false,
+            sanitize: true,
+            smartLists: true,
+            smartypants: false
+        });
+        $(".markdown").each(function(){
+            var renderedHtml = marked($(this).text());
+            $(this).html(renderedHtml);
+            console.log(renderedHtml);
+        });
+      
+        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
+      });
+    </script>
+    <link rel='stylesheet' href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -50,10 +76,10 @@
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
                    <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li class='active'><a href='{% url 'theorems:subjects'  %}?page=1'>Subjects</a></li>
-                   <li> <a href='{% url 'theorems:definitions'  %}?page=1'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}?page=1'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}?page=1'>Questions</a></li>
+                   <li class='active'><a href='{% url 'theorems:subjects'  %}'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions'  %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems'  %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions'  %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -62,102 +88,78 @@
         </header>
         <div class='wrapper'>
             <main>
-                {% if subject_name %}<h3 class='center'>{{ subject_name }}</h3>{% endif %}
+              {% if subject_name %}<h3 class='center'>{{ subject_name }}</h3>{% endif %}
+	      <table id="defTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+		<thead>
+		  <tr>
+		    <th>Term</th>
+		    <th>Definition</th>
+		    <th>Used In</th>
+		  </tr>
+		</thead>
+		<tfoot>
+		  <tr>
+		    <th>Term</th>
+		    <th>Definition</th>
+		    <th>Used In</th>
+		  </tr>
+		</tfoot>
+		<tbody>
                 {% if definitions %}
-                <div class='center'>
-                    Definitions {{ definitions.start_index }} &ndash; {{ definitions.end_index }} of {{ definitions.paginator.count }}
-                </div>
-                <ul>
                 {% for definition in definitions %}
-                    <li> {{ definition.definition_name }}
-                        <ul>
-                            <li>{{ definition.definition|safe|linebreaksbr }}</li>                            
-                            {% for link in definition.proof_definition_link_set.all %}
-                                {% proof_index link.proof as proofindex %}
-                                {% if forloop.first %}
-                            <li>Linked to in: {% endif %} 
-                                <a href="{% url 'theorems:theorem_proof' link.proof.theorem.id  %}?page={{proofindex}}">proof {{proofindex}}</a> of {{ link.proof.theorem.theorem_name }}
-                                {% if not forloop.last %}, {% else %}</li>{% endif %}
+                  <tr>
+		    <td>{{ definition.definition_name }}</td>
+                    <td><button type="button" class="btn-link" data-toggle="modal" data-target="#myModal{{forloop.counter}}">view definition</button></td>
+                    <td>{% for link in definition.proof_definition_link_set.all %}
+                          {% proof_index link.proof as proofindex %} 
+                            <a href="{% url 'theorems:theorem_proof' link.proof.theorem.id proofindex %}">proof {{proofindex}}</a> of {{ link.proof.theorem.theorem_name }}
+                              {% if not forloop.last %}, {% endif %}
                             {% endfor %}
-                        </ul>
-                    </li>
+                    </td>
                 {% endfor %}
-                </ul>
+                
                 {% else %} 
-                <div>There are no definitions to display at this time.</div>
+                <tr><td></td><td></td><td></td><td></td></tr>
                 {% endif %}
-            
-              {% if definitions.has_other_pages %} 
-                {% if definitions.has_previous %}
-                <ul class="paging text-center">
-                    <li><a class="btn btn-default" href="?page={{definitions.previous_page_number}}"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
-                
-                {% else %}
-                <ul class="paging text-center">
-                    <li><a class="btn btn-default disabled" href="#"><span class="glyphicon glyphicon-chevron-left"></span>Previous</a></li>
-                
-                {% endif %}
+		</tbody>
+              </table>
+	      {% if definitions %}
+              {% for definition in definitions %}
+                <!-- Modal -->
+		<div id="myModal{{forloop.counter}}" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
 
+		    <!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title">{{definition.definition_name}}</h4>
+		      </div>
+		      <div class="modal-body">
+			<p class="markdown">{{definition.definition}}</p>
+		      </div>
+		      <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
 
-                {% if definitions.has_previous %}
-                  {% if definitions.previous_page_number|add:"-2" > 1 %}
-		      <li><a href="?page=1">1</a></li>
-                      <li>...</li>
-		      <li><a href="?page={{definitions.previous_page_number|add:'-1'}}">{{definitions.previous_page_number|add:"-1"}}</a></li>
-		      <li><a href="?page={{definitions.previous_page_number}}">{{definitions.previous_page_number}}</a></li>
-			      
-		  {% elif definitions.previous_page_number|add:"-1" > 1 %}
-		      <li><a href="?page=1">1</a></li>
-		      <li><a href="?page={{definitions.previous_page_number|add:'-1'}}">{{definitions.previous_page_number|add:"-1"}}</a></li>
-		      <li><a href="?page={{definitions.previous_page_number}}">{{definitions.previous_page_number}}</a></li>
-				      
-		  {% elif definitions.previous_page_number > 1 %}
-		      <li><a href="?page=1">1</a></li>
-		      <li><a href="?page={{definitions.previous_page_number}}">{{definitions.previous_page_number}}</a></li>
-					
-		  {% else %}
-		      <li><a href="?page=1">1</a></li>
-                  {% endif %}
-                {% endif %}
-
-                      <li><a class='disabled btn btn-link' href="#">{{definitions.number}}</a></li>  
-                  
-
-                {% if definitions.has_next %}
-                  {% if definitions.next_page_number|add:"2" < definitions.paginator.num_pages %} 
-
-		      <li><a href="?page={{definitions.next_page_number}}">{{definitions.next_page_number}}</a></li>
-		      <li><a href="?page={{definitions.next_page_number|add:'1'}}">{{definitions.next_page_number|add:"1"}}</a></li>
-		      <li>...</li>
-		      <li><a href="?page={{definitions.paginator.num_pages}}">{{definitions.paginator.num_pages}}</a></li>
-
-		  {% elif definitions.next_page_number|add:"1" < definitions.paginator.num_pages %}
-                      <li><a href="?page={{definitions.next_page_number}}">{{definitions.next_page_number}}</a></li>
-		      <li><a href="?page={{definitions.next_page_number|add:'1'}}">{{definitions.next_page_number|add:"1"}}</a></li>
-		      <li><a href="?page={{definitions.paginator.num_pages}}">{{definitions.paginator.num_pages}}</a></li>
-
-		  {% elif definitions.next_page_number < definitions.paginator.num_pages %}
-                      <li><a href="?page={{definitions.next_page_number}}">{{definitions.next_page_number}}</a></li>
-		      <li><a href="?page={{definitions.paginator.num_pages}}">{{definitions.paginator.num_pages}}</a></li>
-                  {% else %}
-                        <li>{{ definitions.num_pages }}</li>
-                      <li><a href="?page={{definitions.paginator.num_pages}}">{{definitions.paginator.num_pages}}</a></li>
-                  {% endif %}															
-                {% endif %}
-
-                {% if definitions.has_next %}
-                    <li><a class="btn btn-default" href="?page={{definitions.next_page_number}}">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
-                </ul>
-                {% else %}
-                    <li><a class="disabled btn btn-default" href="#">Next<span class="glyphicon glyphicon-chevron-right"></span></a></li>
-                </ul>
-                {% endif %}
-              {% endif %}
+		  </div>
+		</div>
+		{% endfor %}
+	      {% endif %}
             </main>
         </div> <!-- div.wrapper -->
         <footer>
             Footer
         </footer>
     </div> <!-- div.container -->
+    <script>
+    $(document).ready(function() {
+        $('#defTable').DataTable({
+            "lengthMenu": [10,25,50],
+            "pagingType": "full_numbers"
+        });
+    });
+    </script>
 </body>    
 </html>

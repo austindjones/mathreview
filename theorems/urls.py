@@ -11,10 +11,9 @@ urlpatterns = [
     url(r'^subjects/(?P<subject_id>[1-9]*([0-9]+))/definitions/$',views.subject_definitions, name='subject_definitions'),
     #theorems
     url(r'^theorems/$', views.theorems, name='theorems'),
-    url(r'^theorems/(?P<theorem_id>[1-9]*([0-9]+))/$', views.theorem_proof, name='theorem_proof'),
+    url(r'^theorems/(?P<theorem_id>[1-9]*([0-9]+))/proof/(?P<proof_num>[1-9]*([0-9]+))/$', views.theorem_proof, name='theorem_proof'),
     #definitions
     url(r'^definitions/$', views.definitions, name='definitions'),
-    url(r'^definitions/(?P<definition_id>[1-9]*([0-9]+))/$', views.definition, name='definition'),
 
     #questions
     url(r'^questions/$', views.questions, name='questions'),
