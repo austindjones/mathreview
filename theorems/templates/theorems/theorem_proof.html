@@ -4,7 +4,7 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <title>index</title>
+    <title>Proofs</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
@@ -96,10 +96,10 @@
                 
                 {% endif %}
 		<div class="row">
-		  <div class="col-xs-7" style="margin-top:.5em;">
+		  <div class="col-xs-4" style="margin-top:.5em;">
 		    Showing {{proofs.start_index}} to {{proofs.end_index}} of {{proofs.paginator.count}}
 		  </div>
-		  <div class="col-xs-5 text-right">
+		  <div class="col-xs-8 text-right">
 	            <ul class='pagination'>
                 {% if proofs.has_previous %}
                       <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.previous_page_number %}">Previous</a></li>
