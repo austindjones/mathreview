@@ -16,7 +16,6 @@ urlpatterns = [
     url(r'^definitions/$', views.definitions, name='definitions'),
 
     #questions
-    url(r'^questions/$', views.questions, name='questions'),
-    url(r'^questions/(?P<question_id>[1-9]*([0-9]+))/$', views.question, name='question')
+    url(r'^questions/page/(?P<page_num>[1-9]*([0-9]+))/$', views.questions, name='questions'),
 ]
 

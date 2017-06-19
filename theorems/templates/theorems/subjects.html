@@ -75,11 +75,11 @@
             </div> <!--navbar-header -->
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                   <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li class='active'><a href='{% url 'theorems:subjects'  %}'>Subjects</a></li>
-                   <li> <a href='{% url 'theorems:definitions'  %}'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}'>Questions</a></li>
+                   <li><a href='{% url 'theorems:index' %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li class='active'><a href='{% url 'theorems:subjects' %}'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions' %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems' %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions' page_num=1 %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>

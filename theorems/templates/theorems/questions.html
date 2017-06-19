@@ -71,11 +71,11 @@
             </div> <!--navbar-header -->
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                   <li><a href='{% url 'theorems:index'  %}'><span class='glyphicon glyphicon-home'></span></a></li>
-                   <li class='active'><a href='{% url 'theorems:subjects'  %}'>Subjects</a></li>
-                   <li> <a href='{% url 'theorems:definitions'  %}'>Definitions</a></li>
-                   <li> <a href='{% url 'theorems:theorems'  %}'>Theorems</a></li>
-                   <li> <a href='{% url 'theorems:questions'  %}'>Questions</a></li>
+                   <li><a href='{% url 'theorems:index' %}'><span class='glyphicon glyphicon-home'></span></a></li>
+                   <li class='active'><a href='{% url 'theorems:subjects' %}'>Subjects</a></li>
+                   <li> <a href='{% url 'theorems:definitions' %}'>Definitions</a></li>
+                   <li> <a href='{% url 'theorems:theorems' %}'>Theorems</a></li>
+                   <li> <a href='{% url 'theorems:questions' page_num=1 %}'>Questions</a></li>
                 </ul>
             </div> <!-- navbar -->
         </nav>
@@ -84,38 +84,51 @@
         </header>
         <div class='wrapper'>
             <main>
-                {% if subjects %}
-                <h3 class='center'>Subjects</h3>
-                <div class='center'>
-                    Subjects {{ subjects.start_index }} &ndash; {{ subjects.end_index }} of {{ subjects.paginator.count }}
+              <h3 class='center'>Questions</h3>
+              {% if questions %}
+	      {% for question in questions %}
+              <div class="panel panel-default">
+		  <div class="panel-heading"><h4 class='panel-title'><span class='panel-padded'>Question {{forloop.counter}}</span></h4></div>
+                  <div class="panel-body">
+		    <div class="markdown">{{question.question_text}}</div>
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a class="panel-padded" data-toggle="collapse" href="#answer{{forloop.counter}}">Answer<span class="caret"></a>
+                          </h4>
+                        </div>
+                        <div id="answer{{forloop.counter}}" class="panel-collapse collapse">
+                          <div class="panel-body markdown">{{question.answer_text}}</div>
+                        </div>
+                      </div>
+                    </div>
+		  </div>
                 </div>
-                <ul>
-                {% for subject in subjects %}
-                    <li>{{ subject.subject_name  }}
-                        <ul>
-                            <li><a href='{% url 'theorems:subject_theorems' subject.id  %}'>Theorems</a></li>
-                            <li><a href='{% url 'theorems:subject_definitions' subject.id  %}'>Definitions</a></li>
-                        </ul>
-                    </li>
-                {% endfor %}
-                </ul>
-                {% endif %}
-            
-                <div class="pagination">
-                    <span class="step-links">
-                    {% if subjects.has_previous %}
-                    <a href="?page={{ subjects.previous_page_number }}">previous</a>
-                    {% endif %}
+	      {% endfor %}
+	      {% else %}
+	      <div class="well well-lg">There are no questions today, try again later</div>
+	      {% endif %}
+	      <div class='row'>
+		<div class='col-xs-7'>
+                  Showing {{ questions.start_index }} to {{questions.end_index}} of {{questions.paginator.count}}
+		</div>
+		<div class="col-xs-5 text-right">
+	      <ul class="pagination">
+		  {% if questions.has_previous %}
+		  <li><a href="{% url 'theorems:questions' questions.previous_page_number %}">previous</a></li>
+		  {% else %}
+		  <li class="disabled"><a href="#">previous</a></li>
+		  {% endif %}
 
-                    <span class="current">
-                    Page {{ subjects.number }} of {{ subjects.paginator.num_pages }}.
-                    </span>
-
-                    {% if subjects.has_next %}
-                    <a href="?page={{ subjects.next_page_number }}">next</a>
-                    {% endif %}
-                    </span>
-                </div>
+                  {% if questions.has_next %}
+                  <li><a href="{% url 'theorems:questions' questions.next_page_number %}">next</a></li>
+		  {% else %}
+		  <li class="disabled"><a href="#">next</a></li>
+                  {% endif %}
+              </ul>
+	        </div> <!-- clol-xs-5-->
+	      </div> <!-- div.row -->
             </main>
         </div> <!-- div.wrapper -->
         <footer>
