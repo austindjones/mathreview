@@ -3,6 +3,7 @@
 *db.sqlite3
 __pycache__
 db.mysql
+static
 theorems/static
 mathreview
 theorems/media

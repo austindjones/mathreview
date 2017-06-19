@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <title>index</title>
+    <title>Questions</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
@@ -32,32 +33,10 @@
             }
         });
     </script>
-	{% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.min.js"></script>
     <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
-    <script>
-      $(document).ready(function(){
-          marked.setOptions({
-            renderer: new marked.Renderer(),
-            gfm: true,
-            tables: true,
-            breaks: true,
-            pedantic: false,
-            sanitize: true,
-            smartLists: true,
-            smartypants: false
-        });
-        $(".markdown").each(function(){
-            var renderedHtml = marked($(this).text());
-            $(this).html(renderedHtml);
-            console.log(renderedHtml);
-        });
-      
-        MathJax.Hub.Configured();  //this must be called to start mathjax rendering
-      });
-    </script>
+    <script src="{% static 'theorems/javascripts.js' %}"></script>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -110,10 +89,10 @@
 	      <div class="well well-lg">There are no questions today, try again later</div>
 	      {% endif %}
 	      <div class='row'>
-		<div class='col-xs-7'>
+		<div class="col-sm-7">
                   Showing {{ questions.start_index }} to {{questions.end_index}} of {{questions.paginator.count}}
 		</div>
-		<div class="col-xs-5 text-right">
+		<div class="col-sm-5 text-right">
 	      <ul class="pagination">
 		  {% if questions.has_previous %}
 		  <li><a href="{% url 'theorems:questions' questions.previous_page_number %}">previous</a></li>
@@ -127,7 +106,7 @@
 		  <li class="disabled"><a href="#">next</a></li>
                   {% endif %}
               </ul>
-	        </div> <!-- clol-xs-5-->
+	        </div> <!-- col-sm-5-->
 	      </div> <!-- div.row -->
             </main>
         </div> <!-- div.wrapper -->
