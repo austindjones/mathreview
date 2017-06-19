@@ -96,10 +96,10 @@
                 
                 {% endif %}
 		<div class="row">
-		  <div class="col-xs-4" style="margin-top:.5em;">
+		  <div class="col-sm-7" style="margin-top:.5em;">
 		    Showing {{proofs.start_index}} to {{proofs.end_index}} of {{proofs.paginator.count}}
 		  </div>
-		  <div class="col-xs-8 text-right">
+		  <div class="col-sm-5 text-right">
 	            <ul class='pagination'>
                 {% if proofs.has_previous %}
                       <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.previous_page_number %}">Previous</a></li>
