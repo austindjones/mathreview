@@ -99,8 +99,18 @@ def definitions(request):
               }
     return render(request,'theorems/definitions.html',context)
 
-def questions(request):
-    return HttpResponse("""You're looking at all the questions on page %s""" % 1)
-
-def question(request, question_id):
-    return HttpResponse("""You're looking at question %s""" % question_id)
+def questions(request,page_num):
+    rpp = 3
+    question_list = Question.objects.order_by('id')
+    paginator = Paginator(question_list, rpp ,orphans=0 ,allow_empty_first_page=True)
+    page = page_num
+    try:    
+        quests = paginator.page(page)
+    except PageNotAnInteger:
+        return redirect('theorem:questions',page_num=1,permanent=True) # redirect to first page
+    except EmptyPage:
+        return redirect('theorem:questions',page_num=paginator.num_pages,permanent=True) # show last page
+    context = {
+                  'questions':quests
+              }
+    return render(request,'theorems/questions.html',context)
