@@ -89,14 +89,16 @@
                                   </div>
                                 </div>
                         {% if forloop.last %}</div></div></div>{% endif %}  
-                    {% endfor %}
-                <h4>PROOF:</h4>
-                    <div class="markdown">{{proof.theorem_proof}}</div>  
+	            {% endfor %}
+		<div class="panel panel-default">
+                  <div class="panel-heading"><h4 class="panel-title"><span class="panel-padded">PROOF:</span></h4></div>
+                  <div class="panel-body markdown">{{proof.theorem_proof}}</div>
+                </div>	   
                 {% endfor %}
                 
                 {% endif %}
 		<div class="row">
-		  <div class="col-sm-7" style="margin-top:.5em;">
+		  <div class="col-sm-7">
 		    Showing {{proofs.start_index}} to {{proofs.end_index}} of {{proofs.paginator.count}}
 		  </div>
 		  <div class="col-sm-5 text-right">
