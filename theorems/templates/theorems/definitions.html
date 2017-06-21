@@ -1,13 +1,13 @@
 {% load theorems_extra %}
 {% load static %}
-<!DOCTYPE html />
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8' />
     <meta name='viewport' content='width=device-width,initial-scale=1' />
     <title>Definitions</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG'&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
         MathJax.Hub.Config({
             extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
             jax: ["input/TeX", "output/SVG"],
@@ -43,7 +43,7 @@
     <link rel='stylesheet' href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
-<body class='homepage'>
+<body class='homepage' onresize="headerfooter()">
     <div class='container-fluid'>
         <nav class='navbar navbar-inverse'>
             <div class="navbar-header">
@@ -63,11 +63,10 @@
             </div> <!-- navbar -->
         </nav>
         <header>
-            Math Review
+            <canvas id='header' width='200px' height='200px'>Math Review</canvas>
         </header>
         <div class='wrapper'>
             <main>
-                {% if definitions %}
                 <h3 class='center'>Definitions</h3>
                 <table id="defTable" class="longtable table table-striped table-bordered" cellspacing="0" width="100%">
                   <thead>
@@ -87,6 +86,7 @@
                     </tr>
                   </tfoot>
                   <tbody>
+		  {% if definitions %}
                   {% for definition in definitions %}
                     <tr>
                       <td>{{ definition.definition_name }}</td>
@@ -108,31 +108,49 @@
                 </table>
 		{% for definition in definitions %}
                 <!-- Modal -->
-		<div id="myModal{{forloop.counter}}" class="modal fade" role="dialog">
-		  <div class="modal-dialog">
-
-		    <!-- Modal content-->
-		    <div class="modal-content">
-		      <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h4 class="modal-title">{{definition.definition_name}}</h4>
-		      </div>
+	        <div id="myModal{{forloop.counter}}" class="modal fade" role="dialog">
+	          <div class="modal-dialog">
+                  <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">{{definition.definition_name}}</h4>
+                      </div>
 		      <div class="modal-body">
-			<p class="markdown">{{definition.definition}}</p>
-		      </div>
+                        <p class="markdown">{{definition.definition}}</p>
+	              </div>
 		      <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 		      </div>
-		    </div>
-		  </div>
-		</div>
-		{% endfor %}
+                    </div>
+	          </div>
+	        </div>
+	        {% endfor %}
             </main>
         </div> <!-- div.wrapper -->
+	
         <footer>
-            Footer
+          <canvas id="footCanvas" height="200px" width="200px"></canvas>
+	  <canvas id="footCanvas2" height="200px" width="200px"></canvas>
         </footer>
-    </div> <!-- div.container -->
+    </div> <!-- div.container-fluid -->
+    <div style='display:none;'>
+      <img src="{% static 'theorems/images/img0.png' %}" />
+      <img src="{% static 'theorems/images/img1.png' %}" />
+      <img src="{% static 'theorems/images/img2.png' %}" />
+      <img src="{% static 'theorems/images/img3.png' %}" />
+      <img src="{% static 'theorems/images/img4.png' %}" />
+      <img src="{% static 'theorems/images/img5.png' %}" />
+      <img src="{% static 'theorems/images/img6.png' %}" />
+      <img src="{% static 'theorems/images/img7.png' %}" />
+      <img src="{% static 'theorems/images/img8.png' %}" />
+      <img src="{% static 'theorems/images/img9.png' %}" />
+      <img src="{% static 'theorems/images/img10.png' %}" />
+      <img src="{% static 'theorems/images/img11.png' %}" />
+      <img src="{% static 'theorems/images/img12.png' %}" />
+      <img src="{% static 'theorems/images/img13.png' %}" />
+      <img src="{% static 'theorems/images/img14.png' %}" />
+    </div>
     <script>
     $(document).ready(function() {
         $('#defTable').DataTable({

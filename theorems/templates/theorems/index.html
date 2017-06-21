@@ -6,41 +6,42 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>Math Review</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
-        MathJax.Hub.Config({
-            extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
-            jax: ["input/TeX", "output/SVG"],
-            SVG: {
-                     font:"STIX-web"
-            },
-            tex2jax: { 
-                inlineMath:  [ ['$','$']     ,['{$','$}']     , ['\\(','\\)'] ], 
-                displayMath: [ ['$$','$$'] ,['{$$','$$}'] , ['\\[','\\]'] ],
-                processEscapes: true 
-            },
-            TeX: {
-                extensions: ["AMSmath.js", "AMSsymbols.js"],
-                Macros: {
-                R: "{\\mathbb{R}}",
-                bold: ["{\\bf #1}",1],
-                C: "{\\mathbb{C}}",
-                N: "{\\mathbb{N}}",
-                Z: "{\\mathbb{Z}}",
-	        Q: "{\\mathbb{Q}}",
-                ds: "\\displaystyle",
-                textdef: ["\\textit{#1}",1],
-                emph: ["\\textit{#1}",1]
-                }
-            }
-        });
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured'> <!-- delay start until markdown is processed -->
+      MathJax.Hub.Config({
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+        jax: ["input/TeX", "output/SVG"],
+        SVG: {
+          font:"STIX-web"
+        },
+        tex2jax: { 
+          skipTags: ["script","noscript","style","textarea","pre","code"],
+          inlineMath:  [ ['$','$']     ,['{$','$}']     , ['\\(','\\)'] ], 
+          displayMath: [ ['$$','$$'] ,['{$$','$$}'] , ['\\[','\\]'] ],
+          processEscapes: true 
+        },
+        TeX: {
+          extensions: ["AMSmath.js", "AMSsymbols.js"],
+          Macros: {
+            R: "{\\mathbb{R}}",
+            bold: ["{\\bf #1}",1],
+            C: "{\\mathbb{C}}",
+            N: "{\\mathbb{N}}",
+            Z: "{\\mathbb{Z}}",
+            ds: "\\displaystyle",
+            textdef: ["\\textit{#1}",1],
+            emph: ["\\textit{#1}",1]
+          }
+        }
+      });
     </script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
     <script src="{% static 'theorems/javascripts.js' %}"></script>
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/xits-math" type="text/css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
-<body class='homepage'>
+<body class='homepage' onresize="headerfooter()">
     <div class='container-fluid'>
         <nav class='navbar navbar-inverse'>
             <div class="navbar-header">
@@ -60,7 +61,7 @@
             </div> <!-- navbar -->
         </nav>
         <header>
-            Math Review
+            <canvas id='header' width='200px' height='200px'>Math Review</canvas>
         </header>
         <div class='wrapper'>
             <main>
@@ -88,8 +89,26 @@
             </main>
         </div> <!-- div.wrapper -->
         <footer>
-            Footer
+          <canvas id="footCanvas" height="200px" width="200px"></canvas>
+	  <canvas id="footCanvas2" height="200px" width="200px"></canvas>
         </footer>
     </div> <!-- div.container -->
+    <div style='display:none;'>
+      <img src="{% static 'theorems/images/img0.png' %}" />
+      <img src="{% static 'theorems/images/img1.png' %}" />
+      <img src="{% static 'theorems/images/img2.png' %}" />
+      <img src="{% static 'theorems/images/img3.png' %}" />
+      <img src="{% static 'theorems/images/img4.png' %}" />
+      <img src="{% static 'theorems/images/img5.png' %}" />
+      <img src="{% static 'theorems/images/img6.png' %}" />
+      <img src="{% static 'theorems/images/img7.png' %}" />
+      <img src="{% static 'theorems/images/img8.png' %}" />
+      <img src="{% static 'theorems/images/img9.png' %}" />
+      <img src="{% static 'theorems/images/img10.png' %}" />
+      <img src="{% static 'theorems/images/img11.png' %}" />
+      <img src="{% static 'theorems/images/img12.png' %}" />
+      <img src="{% static 'theorems/images/img13.png' %}" />
+      <img src="{% static 'theorems/images/img14.png' %}" />
+    </div>
 </body>    
 </html>
