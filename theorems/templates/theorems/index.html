@@ -38,6 +38,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="{% static 'theorems/marked/marked.min.js' %}"></script>
     <script src="{% static 'theorems/javascripts.js' %}"></script>
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/xits-math" type="text/css"/>
     <link rel='stylesheet' href='{% static "theorems/style.css" %}' />
 </head>
 <body class='homepage'>
@@ -88,8 +89,80 @@
             </main>
         </div> <!-- div.wrapper -->
         <footer>
-            Footer
+            <canvas id="footCanvas" height="200px" width="200px"></canvas>
         </footer>
     </div> <!-- div.container -->
+    <script>
+      var canvas = document.getElementById('footCanvas');
+      var height = canvas.height;
+      var width = canvas.width;
+      var ctx = canvas.getContext('2d');
+      ctx.font = '72px XITSMathRegular';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      var textWidth = ctx.measureText("π").width;
+      console.log(textWidth);
+
+      ctx.save();
+      ctx.shadowOffsetX = -2;
+      ctx.shadowOffsetY = -2;
+      ctx.shadowBlur = 2;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillStyle = "firebrick";
+      ctx.fillRect(100-textWidth-10,100-72/2-10,200-textWidth-10,200-72/2-10);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 2;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillStyle = "firebrick";
+      ctx.fillRect(0,0,100,100);
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = "firebrick";
+      ctx.fillRect(100-textWidth-10,100-72/2-10,200-textWidth-10,200-72/2-10);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(100-textWidth-5,109-72/2);
+      ctx.fillStyle = "black";
+      ctx.fillText("π",0,0);
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalCompositeOperation = "darken";
+      ctx.save();
+      
+      ctx.rotate(1*Math.PI/4);
+      ctx.scale(1,-1);
+      var lineargradient = ctx.createLinearGradient(0, 0, 100-textWidth-10+100,100-72/2-10+100);
+      lineargradient.addColorStop(0, 'black');
+      lineargradient.addColorStop(.5,'white');
+      lineargradient.addColorStop(1, 'black');
+      ctx.fillStyle = lineargradient;
+      ctx.fillRect(0,0,100,100);
+      ctx.fillRect(100-textWidth-10,100-72/2-10,200-textWidth-10,200-72/2-10);
+      ctx.restore();
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalCompositeOperation = "darken";
+      ctx.save();
+      
+      ctx.rotate(1*Math.PI/4);
+      ctx.scale(1,1);
+      var lineargradient = ctx.createLinearGradient(0, 0, 100-textWidth-10+100,100-72/2-10+100);
+      lineargradient.addColorStop(0, 'black');
+      lineargradient.addColorStop(.5,'white');
+      lineargradient.addColorStop(1, 'black');
+      ctx.fillStyle = lineargradient;
+      ctx.fillRect(0,0,100,100);
+      ctx.fillRect(100-textWidth-10,100-72/2-10,200-textWidth-10,200-72/2-10);
+      ctx.restore();
+      ctx.restore();
+    </script>
 </body>    
 </html>

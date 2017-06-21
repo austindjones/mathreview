@@ -98,23 +98,27 @@
                 
                 {% endif %}
 		<div class="row">
-		  <div class="col-sm-7">
-		    Showing {{proofs.start_index}} to {{proofs.end_index}} of {{proofs.paginator.count}}
+		  <div class="col-sm-5">
+		    <div class="dataTables_info">
+		      Showing {{proofs.start_index}} to {{proofs.end_index}} of {{proofs.paginator.count}}
+		    </div>  
 		  </div>
-		  <div class="col-sm-5 text-right">
-	            <ul class='pagination'>
+		  <div class="col-sm-7">
+		    <div class='dataTables_paginate'>
+	              <ul class='pagination'>
                 {% if proofs.has_previous %}
-                      <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.previous_page_number %}">Previous</a></li>
+                        <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.previous_page_number %}">Previous</a></li>
 		{% else %}
-		      <li class="disabled"><a href="#">Previous</a></li>
+		        <li class="disabled"><a href="#">Previous</a></li>
                 {% endif %}                  
 
                 {% if proofs.has_next %}
-                      <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.next_page_number %}">Next</a></li>
+                        <li><a href="{% url 'theorems:theorem_proof' theorem_id proofs.next_page_number %}">Next</a></li>
 		{% else %}
-		      <li class="disabled"><a href="#">Next</a></li>    
+		        <li class="disabled"><a href="#">Next</a></li>    
 	        {% endif %}
-                    </ul>
+                      </ul>
+		    </div>
 		  </div>
 		</div> <!-- div.row -->
             </main>

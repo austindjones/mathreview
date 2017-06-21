@@ -89,24 +89,28 @@
 	      <div class="well well-lg">There are no questions today, try again later</div>
 	      {% endif %}
 	      <div class='row'>
-		<div class="col-sm-7">
-                  Showing {{ questions.start_index }} to {{questions.end_index}} of {{questions.paginator.count}}
+		<div class="col-sm-5">
+		  <div class="dataTables_info">
+                    Showing {{ questions.start_index }} to {{questions.end_index}} of {{questions.paginator.count}}
+		  </div>
 		</div>
-		<div class="col-sm-5 text-right">
-	      <ul class="pagination">
+		<div class="col-sm-7">
+		  <div class="dataTables_paginate">
+	            <ul class="pagination">
 		  {% if questions.has_previous %}
-		  <li><a href="{% url 'theorems:questions' questions.previous_page_number %}">previous</a></li>
+		      <li><a href="{% url 'theorems:questions' questions.previous_page_number %}">previous</a></li>
 		  {% else %}
-		  <li class="disabled"><a href="#">previous</a></li>
+		      <li class="disabled"><a href="#">previous</a></li>
 		  {% endif %}
 
                   {% if questions.has_next %}
-                  <li><a href="{% url 'theorems:questions' questions.next_page_number %}">next</a></li>
+                      <li><a href="{% url 'theorems:questions' questions.next_page_number %}">next</a></li>
 		  {% else %}
-		  <li class="disabled"><a href="#">next</a></li>
+		      <li class="disabled"><a href="#">next</a></li>
                   {% endif %}
-              </ul>
-	        </div> <!-- col-sm-5-->
+                    </ul>
+		  </div>
+	        </div> <!-- col-sm-7-->
 	      </div> <!-- div.row -->
             </main>
         </div> <!-- div.wrapper -->
